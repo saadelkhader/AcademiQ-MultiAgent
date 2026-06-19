@@ -1,0 +1,802 @@
+{
+  "seed": 42,
+  "runs": 1,
+  "results": [
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q01",
+      "category": "reasoning",
+      "latency_ms": 107.201,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 26,
+      "quality_score": 1.0,
+      "context_cost": 26.0,
+      "selected_agents": [
+        "planner"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q02",
+      "category": "reasoning",
+      "latency_ms": 116.714,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 26,
+      "quality_score": 1.0,
+      "context_cost": 26.198,
+      "selected_agents": [
+        "planner"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q03",
+      "category": "retrieval",
+      "latency_ms": 202.722,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 22,
+      "quality_score": 1.0,
+      "context_cost": 22.334,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q04",
+      "category": "retrieval",
+      "latency_ms": 160.26,
+      "agent_calls": 1,
+      "failed": true,
+      "tokens": 19,
+      "quality_score": 0.0,
+      "context_cost": 19.426,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q05",
+      "category": "calculation",
+      "latency_ms": 74.954,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 14,
+      "quality_score": 1.0,
+      "context_cost": 14.41,
+      "selected_agents": [
+        "tool"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q06",
+      "category": "calculation",
+      "latency_ms": 90.171,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 14,
+      "quality_score": 1.0,
+      "context_cost": 14.5,
+      "selected_agents": [
+        "tool"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q07",
+      "category": "synthesis",
+      "latency_ms": 141.93,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 31,
+      "quality_score": 1.0,
+      "context_cost": 32.305,
+      "selected_agents": [
+        "synth"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q08",
+      "category": "synthesis",
+      "latency_ms": 162.696,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 22,
+      "quality_score": 1.0,
+      "context_cost": 23.104,
+      "selected_agents": [
+        "synth"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q09",
+      "category": "ambiguity",
+      "latency_ms": 82.499,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 14,
+      "quality_score": 1.0,
+      "context_cost": 14.804,
+      "selected_agents": [
+        "clarifier"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q10",
+      "category": "ambiguity",
+      "latency_ms": 66.182,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 15,
+      "quality_score": 0.5,
+      "context_cost": 15.957,
+      "selected_agents": [
+        "clarifier"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q11",
+      "category": "reasoning",
+      "latency_ms": 139.511,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 20,
+      "quality_score": 1.0,
+      "context_cost": 21.406,
+      "selected_agents": [
+        "planner"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q12",
+      "category": "retrieval",
+      "latency_ms": 165.195,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 27,
+      "quality_score": 1.0,
+      "context_cost": 29.087,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q13",
+      "category": "calculation",
+      "latency_ms": 84.771,
+      "agent_calls": 1,
+      "failed": true,
+      "tokens": 17,
+      "quality_score": 0.0,
+      "context_cost": 18.445,
+      "selected_agents": [
+        "tool"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q14",
+      "category": "synthesis",
+      "latency_ms": 135.803,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 30,
+      "quality_score": 1.0,
+      "context_cost": 32.751,
+      "selected_agents": [
+        "synth"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "fixed_hierarchical",
+      "run_id": "run-1",
+      "question_id": "q15",
+      "category": "ambiguity",
+      "latency_ms": 82.904,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 13,
+      "quality_score": 1.0,
+      "context_cost": 14.296,
+      "selected_agents": [
+        "clarifier"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q01",
+      "category": "reasoning",
+      "latency_ms": 221.541,
+      "agent_calls": 1,
+      "failed": true,
+      "tokens": 20,
+      "quality_score": 0.0,
+      "context_cost": 21.6,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q02",
+      "category": "reasoning",
+      "latency_ms": 239.064,
+      "agent_calls": 1,
+      "failed": true,
+      "tokens": 20,
+      "quality_score": 0.0,
+      "context_cost": 21.714,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q03",
+      "category": "retrieval",
+      "latency_ms": 208.747,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 22,
+      "quality_score": 1.0,
+      "context_cost": 24.01,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q04",
+      "category": "retrieval",
+      "latency_ms": 213.533,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 24,
+      "quality_score": 1.0,
+      "context_cost": 26.347,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q05",
+      "category": "calculation",
+      "latency_ms": 210.569,
+      "agent_calls": 1,
+      "failed": true,
+      "tokens": 15,
+      "quality_score": 0.0,
+      "context_cost": 16.564,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q06",
+      "category": "calculation",
+      "latency_ms": 172.299,
+      "agent_calls": 1,
+      "failed": true,
+      "tokens": 14,
+      "quality_score": 0.0,
+      "context_cost": 15.534,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q07",
+      "category": "synthesis",
+      "latency_ms": 189.836,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 31,
+      "quality_score": 1.0,
+      "context_cost": 34.56,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q08",
+      "category": "synthesis",
+      "latency_ms": 185.761,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 22,
+      "quality_score": 1.0,
+      "context_cost": 24.689,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q09",
+      "category": "ambiguity",
+      "latency_ms": 189.014,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 14,
+      "quality_score": 1.0,
+      "context_cost": 15.802,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q10",
+      "category": "ambiguity",
+      "latency_ms": 195.268,
+      "agent_calls": 1,
+      "failed": true,
+      "tokens": 10,
+      "quality_score": 0.0,
+      "context_cost": 11.343,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q11",
+      "category": "reasoning",
+      "latency_ms": 184.085,
+      "agent_calls": 1,
+      "failed": true,
+      "tokens": 13,
+      "quality_score": 0.0,
+      "context_cost": 14.81,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q12",
+      "category": "retrieval",
+      "latency_ms": 236.439,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 27,
+      "quality_score": 1.0,
+      "context_cost": 30.9,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q13",
+      "category": "calculation",
+      "latency_ms": 212.857,
+      "agent_calls": 1,
+      "failed": true,
+      "tokens": 17,
+      "quality_score": 0.0,
+      "context_cost": 19.572,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q14",
+      "category": "synthesis",
+      "latency_ms": 221.497,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 30,
+      "quality_score": 1.0,
+      "context_cost": 34.703,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    },
+    {
+      "config_name": "dynamic_adaptive",
+      "run_id": "run-1",
+      "question_id": "q15",
+      "category": "ambiguity",
+      "latency_ms": 196.321,
+      "agent_calls": 1,
+      "failed": false,
+      "tokens": 13,
+      "quality_score": 1.0,
+      "context_cost": 15.13,
+      "selected_agents": [
+        "retriever"
+      ],
+      "fallback_used": false
+    }
+  ],
+  "summary": {
+    "fixed_hierarchical": {
+      "count": 15,
+      "latency_ms": {
+        "mean": 120.901,
+        "p50": 116.714,
+        "p90": 164.195,
+        "min": 66.182,
+        "max": 202.722
+      },
+      "agent_calls": {
+        "mean": 1,
+        "p50": 1.0,
+        "p90": 1.0,
+        "min": 1,
+        "max": 1
+      },
+      "failure_rate": 0.133,
+      "tokens": {
+        "mean": 20.667,
+        "p50": 20.0,
+        "p90": 28.8,
+        "min": 13,
+        "max": 31
+      },
+      "quality_score": {
+        "mean": 0.833,
+        "p50": 1.0,
+        "p90": 1.0,
+        "min": 0.0,
+        "max": 1.0
+      },
+      "context_cost": {
+        "mean": 21.668,
+        "p50": 21.406,
+        "p90": 31.018,
+        "min": 14.296,
+        "max": 32.751
+      }
+    },
+    "dynamic_adaptive": {
+      "count": 15,
+      "latency_ms": {
+        "mean": 205.122,
+        "p50": 208.747,
+        "p90": 230.48,
+        "min": 172.299,
+        "max": 239.064
+      },
+      "agent_calls": {
+        "mean": 1,
+        "p50": 1.0,
+        "p90": 1.0,
+        "min": 1,
+        "max": 1
+      },
+      "failure_rate": 0.467,
+      "tokens": {
+        "mean": 19.467,
+        "p50": 20.0,
+        "p90": 28.8,
+        "min": 10,
+        "max": 31
+      },
+      "quality_score": {
+        "mean": 0.533,
+        "p50": 1.0,
+        "p90": 1.0,
+        "min": 0.0,
+        "max": 1.0
+      },
+      "context_cost": {
+        "mean": 21.819,
+        "p50": 21.6,
+        "p90": 33.096,
+        "min": 11.343,
+        "max": 34.703
+      }
+    }
+  },
+  "visualization": {
+    "histograms": {
+      "fixed_hierarchical": {
+        "latency_ms": [
+          107.201,
+          116.714,
+          202.722,
+          160.26,
+          74.954,
+          90.171,
+          141.93,
+          162.696,
+          82.499,
+          66.182,
+          139.511,
+          165.195,
+          84.771,
+          135.803,
+          82.904
+        ],
+        "quality_score": [
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.5,
+          1.0,
+          1.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "tokens": [
+          26,
+          26,
+          22,
+          19,
+          14,
+          14,
+          31,
+          22,
+          14,
+          15,
+          20,
+          27,
+          17,
+          30,
+          13
+        ]
+      },
+      "dynamic_adaptive": {
+        "latency_ms": [
+          221.541,
+          239.064,
+          208.747,
+          213.533,
+          210.569,
+          172.299,
+          189.836,
+          185.761,
+          189.014,
+          195.268,
+          184.085,
+          236.439,
+          212.857,
+          221.497,
+          196.321
+        ],
+        "quality_score": [
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "tokens": [
+          20,
+          20,
+          22,
+          24,
+          15,
+          14,
+          31,
+          22,
+          14,
+          10,
+          13,
+          27,
+          17,
+          30,
+          13
+        ]
+      }
+    },
+    "curves": {
+      "fixed_hierarchical": {
+        "latency_sorted": [
+          66.182,
+          74.954,
+          82.499,
+          82.904,
+          84.771,
+          90.171,
+          107.201,
+          116.714,
+          135.803,
+          139.511,
+          141.93,
+          160.26,
+          162.696,
+          165.195,
+          202.722
+        ],
+        "quality_sorted": [
+          0.0,
+          0.0,
+          0.5,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "tokens_sorted": [
+          13,
+          14,
+          14,
+          14,
+          15,
+          17,
+          19,
+          20,
+          22,
+          22,
+          26,
+          26,
+          27,
+          30,
+          31
+        ]
+      },
+      "dynamic_adaptive": {
+        "latency_sorted": [
+          172.299,
+          184.085,
+          185.761,
+          189.014,
+          189.836,
+          195.268,
+          196.321,
+          208.747,
+          210.569,
+          212.857,
+          213.533,
+          221.497,
+          221.541,
+          236.439,
+          239.064
+        ],
+        "quality_sorted": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "tokens_sorted": [
+          10,
+          13,
+          13,
+          14,
+          14,
+          15,
+          17,
+          20,
+          20,
+          22,
+          22,
+          24,
+          27,
+          30,
+          31
+        ]
+      }
+    },
+    "radar": {
+      "fixed_hierarchical": {
+        "latency": 0.683,
+        "tokens": 0.492,
+        "context_cost": 0.558,
+        "reliability": 1.0,
+        "quality": 0.833,
+        "efficiency": 0.0
+      },
+      "dynamic_adaptive": {
+        "latency": 0.196,
+        "tokens": 0.549,
+        "context_cost": 0.552,
+        "reliability": 0.0,
+        "quality": 0.533,
+        "efficiency": 0.0
+      }
+    }
+  }
+}

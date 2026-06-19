@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AcademiQ — Assistant Multi-Agents</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127891;</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f7ede3;--sidebar:#c96442;--sidebar2:#b85538;--card:#ffffff;--card2:#fdf6f1;
+  --border:#ecddd4;--text:#2c1a0e;--dim:#9e7a65;--purple:#7c5cbf;--teal:#34c9a0;
+  --orange:#f4845f;--amber:#ffb347;--blue:#4a90d9;--red:#e05c5c;--green:#4ecdc4;
+  --font:'Nunito',sans-serif;--mono:'DM Mono',monospace;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+/* TOPBAR */
+.topbar{height:58px;background:var(--card);border-bottom:2px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:14px;flex-shrink:0;box-shadow:0 2px 12px rgba(201,100,66,.08);z-index:10}
+.logo{width:36px;height:36px;background:linear-gradient(135deg,var(--sidebar),var(--orange));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 4px 12px rgba(201,100,66,.3)}
+.topbar-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--sidebar)}
+.topbar-badge{background:linear-gradient(135deg,var(--sidebar),var(--orange));color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.05em}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.status-pill{display:flex;align-items:center;gap:6px;font-size:12px;font-family:var(--mono);color:var(--dim);background:var(--card2);border:2px solid var(--border);padding:5px 12px;border-radius:20px;font-weight:600}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--red)}.sdot.ok{background:var(--green)}
+/* LAYOUT */
+.layout{display:flex;flex:1;overflow:hidden}
+/* SIDEBAR */
+.sidebar{width:230px;background:var(--sidebar);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;box-shadow:4px 0 24px rgba(201,100,66,.2)}
+.sb-profile{padding:24px 20px 16px;text-align:center;border-bottom:1px solid rgba(255,255,255,.15)}
+.sb-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#fff8f5,var(--orange));margin:0 auto 10px;display:flex;align-items:center;justify-content:center;font-size:26px;border:3px solid rgba(255,255,255,.4);box-shadow:0 4px 14px rgba(0,0,0,.15)}
+.sb-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px}
+.sb-role{font-size:11px;color:rgba(255,255,255,.6)}
+.sb-section{padding:14px 16px 6px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);font-weight:700}
+.sb-btn{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:600;color:rgba(255,255,255,.75);border:none;background:none;width:100%;text-align:left;transition:all .18s;margin:1px 8px;width:calc(100% - 16px)}
+.sb-btn:hover{background:rgba(255,255,255,.15);color:#fff}
+.sb-btn.active{background:rgba(255,255,255,.22);color:#fff;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.sb-btn .ico{font-size:16px;width:22px;text-align:center}
+.sb-metrics{margin:12px;background:rgba(255,255,255,.12);border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,.1)}
+.sb-metrics .m-label{font-size:10px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;font-weight:700}
+.sb-metrics .m-row{display:flex;justify-content:space-between;padding:4px 0;color:rgba(255,255,255,.65);font-size:12px}
+.sb-metrics .m-row span:last-child{color:#fff;font-weight:700}
+/* MAIN */
+.main{flex:1;overflow:hidden;position:relative}
+.panel{position:absolute;inset:0;overflow-y:auto;padding:28px;display:none;opacity:0;transform:translateY(10px);transition:opacity .22s,transform .22s}
+.panel.active{display:block;opacity:1;transform:translateY(0)}
+/* TYPOGRAPHY */
+.panel-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;margin-bottom:4px;color:var(--text)}
+.panel-sub{color:var(--dim);font-size:13px;margin-bottom:26px;font-weight:500}
+/* CARDS */
+.card{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:22px;box-shadow:0 4px 20px rgba(201,100,66,.07)}.card+.card{margin-top:14px}
+.card-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+/* METRIC CARDS */
+.metric-card{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:18px 16px;box-shadow:0 4px 16px rgba(201,100,66,.06);position:relative;overflow:hidden}
+.metric-card::after{content:'';position:absolute;bottom:-10px;right:-10px;width:50px;height:50px;border-radius:50%;opacity:.08}
+.metric-card.mc-orange::after{background:var(--orange)}
+.metric-card.mc-teal::after{background:var(--teal)}
+.metric-card.mc-purple::after{background:var(--purple)}
+.metric-card.mc-blue::after{background:var(--blue)}
+.metric-val{font-family:var(--mono);font-size:26px;font-weight:700;margin-bottom:4px}
+.metric-lbl{font-size:11px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.metric-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:10px}
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 140px)}
+.chat-area{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding-bottom:10px;min-height:0}
+.msg{max-width:75%;padding:14px 18px;border-radius:18px;font-size:13.5px;line-height:1.65;animation:fadeup .22s ease}
+@keyframes fadeup{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{align-self:flex-end;background:linear-gradient(135deg,var(--sidebar),var(--orange));color:#fff;border-bottom-right-radius:5px;box-shadow:0 4px 16px rgba(201,100,66,.3)}
+.msg.bot{align-self:flex-start;background:var(--card);border:2px solid var(--border);border-bottom-left-radius:5px;box-shadow:0 4px 14px rgba(201,100,66,.07)}
+.agent-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-family:var(--mono);padding:3px 10px;border-radius:20px;margin-bottom:8px;background:linear-gradient(135deg,rgba(201,100,66,.12),rgba(244,132,95,.08));color:var(--sidebar);border:1px solid rgba(201,100,66,.2);font-weight:700}
+.pipeline-steps{display:flex;gap:8px;flex-wrap:wrap;padding:10px 0}
+.step{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600;border:2px solid var(--border);background:var(--card2);color:var(--dim);transition:all .3s}
+.step.running{border-color:var(--blue);color:var(--blue);background:rgba(74,144,217,.08);animation:pulse 1s infinite}
+.step.done{border-color:var(--green);color:var(--green);background:rgba(78,205,196,.1)}
+@keyframes pulse{0%,100%{opacity:.7}50%{opacity:1}}
+.typing{display:flex;align-items:center;gap:8px;padding:14px 18px;background:var(--card);border:2px solid var(--border);border-radius:18px;border-bottom-left-radius:5px;align-self:flex-start;font-size:12px;color:var(--dim);font-weight:600;box-shadow:0 4px 14px rgba(201,100,66,.07)}
+.dots span{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--orange);margin:0 1px;animation:bounce 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes bounce{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}
+.input-row{display:flex;gap:10px;padding-top:14px;border-top:2px solid var(--border);margin-top:auto}
+.input-row textarea{flex:1;background:var(--card);border:2px solid var(--border);border-radius:12px;padding:11px 16px;font-size:13px;font-family:var(--font);color:var(--text);resize:none;height:46px;transition:border .2s;font-weight:500}
+.input-row textarea:focus{outline:none;border-color:var(--sidebar)}
+.send-btn{padding:0 20px;background:linear-gradient(135deg,var(--sidebar),var(--orange));color:#fff;border:none;border-radius:12px;cursor:pointer;font-size:13px;font-weight:700;font-family:var(--font);transition:opacity .2s;box-shadow:0 4px 14px rgba(201,100,66,.3)}.send-btn:hover{opacity:.88}
+/* AGENTS */
+.agent-card{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:22px;box-shadow:0 4px 18px rgba(201,100,66,.07);position:relative;overflow:hidden}
+.agent-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.agent-card.ac-teal::before{background:linear-gradient(90deg,var(--teal),#20b2aa)}
+.agent-card.ac-blue::before{background:linear-gradient(90deg,var(--blue),#2563eb)}
+.agent-card.ac-purple::before{background:linear-gradient(90deg,var(--purple),#5b3fa6)}
+.agent-card.ac-amber::before{background:linear-gradient(90deg,var(--amber),#e0993a)}
+.agent-header{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.agent-icon-wrap{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.agent-name{font-size:15px;font-weight:700;color:var(--text)}
+.agent-role-txt{font-size:11px;color:var(--dim);font-weight:600}
+.health-bar{height:6px;background:rgba(0,0,0,.06);border-radius:3px;overflow:hidden;margin:12px 0}
+.health-fill{height:100%;border-radius:3px;transition:width 1.2s ease}
+.caps{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.cap-tag{font-size:10px;padding:3px 9px;border-radius:20px;background:var(--bg);color:var(--dim);border:1px solid var(--border);font-weight:600}
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+th{text-align:left;padding:9px 14px;color:var(--dim);border-bottom:2px solid var(--border);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+td{padding:9px 14px;border-bottom:1px solid var(--border)}tr:last-child td{border:none}tr:hover td{background:var(--card2)}
+/* PILLS */
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-family:var(--mono);font-weight:700}
+.pill.green{background:rgba(78,205,196,.15);color:#1a9e96}.pill.amber{background:rgba(255,179,71,.15);color:#c47a00}.pill.red{background:rgba(224,92,92,.15);color:#b94040}
+/* BAR CHART */
+.bar-chart{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.bar-row{display:flex;align-items:center;gap:12px;font-size:12px}
+.bar-label{width:90px;color:var(--dim);text-align:right;font-weight:600}
+.bar-track{flex:1;height:22px;background:var(--bg);border-radius:6px;overflow:hidden;border:1px solid var(--border)}
+.bar-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding-left:10px;font-size:11px;font-family:var(--mono);color:#fff;font-weight:700;transition:width 1.2s ease}
+/* FORMS */
+.exam-form{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{display:flex;flex-direction:column;gap:7px}
+.form-group label{font-size:12px;color:var(--dim);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.form-group input,.form-group select{background:var(--card2);border:2px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--text);font-family:var(--font);font-weight:500;transition:border .2s}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--sidebar)}
+.form-group input[type=range]{padding:5px 0;accent-color:var(--sidebar);border:none;background:transparent}
+.full-col{grid-column:1/-1}
+.primary-btn{padding:12px 26px;background:linear-gradient(135deg,var(--sidebar),var(--orange));color:#fff;border:none;border-radius:12px;cursor:pointer;font-size:13px;font-weight:700;font-family:var(--font);transition:opacity .2s;box-shadow:0 4px 16px rgba(201,100,66,.25)}.primary-btn:hover{opacity:.88}
+.sec-btn{padding:10px 20px;background:var(--card2);color:var(--text);border:2px solid var(--border);border-radius:12px;cursor:pointer;font-size:13px;font-weight:600;font-family:var(--font)}
+/* EXAM OUTPUT */
+.exam-output{margin-top:20px;background:var(--card);border:2px solid var(--border);border-radius:16px;overflow:hidden;display:none;box-shadow:0 4px 20px rgba(201,100,66,.08)}
+.exam-header-block{background:linear-gradient(135deg,rgba(201,100,66,.08),rgba(244,132,95,.05));padding:22px;border-bottom:2px solid var(--border)}
+.exam-body{padding:22px;white-space:pre-wrap;font-size:13px;line-height:1.9;font-family:var(--mono);max-height:480px;overflow-y:auto;color:var(--text)}
+.exam-actions{padding:14px 22px;border-top:2px solid var(--border);display:flex;gap:10px;background:var(--card2)}
+/* RAG */
+.drop-zone{border:2px dashed var(--border);border-radius:14px;padding:36px;text-align:center;cursor:pointer;transition:all .2s;background:var(--card2)}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--sidebar);background:rgba(201,100,66,.04)}
+.doc-item{display:flex;align-items:center;gap:14px;padding:14px;background:var(--card2);border:2px solid var(--border);border-radius:12px;margin-top:10px;transition:border .2s}.doc-item:hover{border-color:var(--orange)}
+/* SETTINGS */
+.settings-row{display:flex;gap:10px;align-items:center;margin-bottom:18px}
+.settings-row input{flex:1;background:var(--card2);border:2px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--text);font-family:var(--font);font-weight:500}
+.settings-row input:focus{outline:none;border-color:var(--sidebar)}
+.config-table td:first-child{color:var(--dim);width:200px;font-weight:600}
+.config-table td:last-child{font-family:var(--mono);font-size:12px;font-weight:600}
+.terminal{background:#1a0e08;border:2px solid var(--border);border-radius:12px;padding:16px;font-family:var(--mono);font-size:11px;color:#ffb88c;height:190px;overflow-y:auto;margin-top:14px}
+.terminal .t-line{margin:3px 0}.terminal .t-ok{color:var(--teal)}.terminal .t-err{color:var(--red)}
+/* TOAST */
+.toast-wrap{position:fixed;top:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:999}
+.toast{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:13px 20px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:9px;animation:slidein .3s ease;box-shadow:0 8px 32px rgba(201,100,66,.18)}
+@keyframes slidein{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+/* SKELETON */
+.skeleton{background:linear-gradient(90deg,var(--card) 25%,var(--card2) 50%,var(--card) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:10px}
+@keyframes shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+/* SESSION */
+.session-item{display:flex;align-items:center;gap:14px;padding:16px;background:var(--card);border:2px solid var(--border);border-radius:14px;cursor:pointer;transition:all .18s;margin-bottom:10px}
+.session-item:hover{border-color:var(--orange);box-shadow:0 4px 16px rgba(201,100,66,.1)}
+.session-preview{flex:1;font-size:13px;font-weight:500}
+.session-date{font-size:11px;color:var(--dim);font-family:var(--mono);font-weight:600}
+/* PERF */
+.perf-line{display:flex;align-items:flex-end;gap:4px;height:90px;margin-top:10px;padding:0 4px}
+.perf-bar{flex:1;background:linear-gradient(180deg,var(--orange),rgba(244,132,95,.2));border-radius:4px 4px 0 0;min-height:4px;transition:height .6s;cursor:pointer}
+.perf-bar:hover{background:linear-gradient(180deg,var(--sidebar),rgba(201,100,66,.3))}
+/* EMPTY */
+.empty-state{text-align:center;padding:52px 24px;color:var(--dim)}.empty-state .e-icon{font-size:42px;margin-bottom:14px}.empty-state p{font-size:13px;font-weight:500;line-height:1.6}
+/* INFRA */
+.infra-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px}
+/* SCORE BAR */
+.score-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:12px;font-weight:600}
+.score-track{flex:1;height:7px;background:var(--bg);border-radius:4px;overflow:hidden;border:1px solid var(--border)}
+.score-fill{height:100%;border-radius:4px;transition:width 1.2s ease}
+</style>
+</head>
+<body>
+<div class="toast-wrap" id="toasts"></div>
+<div class="topbar">
+  <div class="logo">&#127891;</div>
+  <span class="topbar-title">AcademiQ</span>
+  <span class="topbar-badge">Multi-Agents AI</span>
+  <div class="topbar-right">
+    <div style="font-size:12px;color:var(--dim);font-weight:600;font-family:var(--mono)" id="topbar-time"></div>
+    <div class="status-pill"><div class="sdot" id="sdot"></div><span id="conn-txt">Déconnecté</span></div>
+  </div>
+</div>
+<div class="layout">
+<nav class="sidebar">
+  <div class="sb-profile">
+    <div class="sb-avatar"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></div>
+    <div class="sb-name">AcademiQ</div>
+    <div class="sb-role">Assistant académique IA</div>
+  </div>
+  <div class="sb-section">Principal</div>
+  <button class="sb-btn active" onclick="show('chat')" id="nav-chat"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Chat académique</button>
+  <button class="sb-btn" onclick="show('routing')" id="nav-routing"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>Décisions routage</button>
+  <button class="sb-btn" onclick="show('docs')" id="nav-docs"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>Documents RAG</button>
+  <button class="sb-btn" onclick="show('agents')" id="nav-agents"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>État des agents</button>
+  <div class="sb-section">Outils</div>
+  <button class="sb-btn" onclick="show('exam')" id="nav-exam"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span>Générateur d'examens</button>
+  <button class="sb-btn" onclick="show('perf')" id="nav-perf"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>Analyse performance</button>
+  <button class="sb-btn" onclick="show('history')" id="nav-history"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>Historique sessions</button>
+  <button class="sb-btn" onclick="show('settings')" id="nav-settings"><span class="ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>Paramètres</button>
+  <div style="flex:1"></div>
+  <div class="sb-metrics">
+    <div class="m-label">Métriques live</div>
+    <div class="m-row"><span>Requêtes</span><span id="m-req">0</span></div>
+    <div class="m-row"><span>Approuvées</span><span id="m-ok">0</span></div>
+    <div class="m-row"><span>Latence moy.</span><span id="m-lat">—</span></div>
+    <div class="m-row"><span>Taux réussite</span><span id="m-rate">—</span></div>
+  </div>
+</nav>
+<div class="main">
+
+  <!-- CHAT -->
+  <div class="panel active" id="panel-chat">
+    <div class="chat-wrap">
+      <div class="chat-area" id="chat-area">
+        <div class="msg bot">
+          <div class="agent-badge">&#129302; Orchestrateur</div>
+          <div>Bonjour ! Je suis <strong>AcademiQ</strong>, votre assistant académique multi-agents. Mon pipeline : <strong>Planification &#8594; RAG &#8594; Synthèse &#8594; Vérification</strong>. Posez votre question !</div>
+        </div>
+      </div>
+      <div class="pipeline-steps" id="pipeline-steps" style="display:none">
+        <div class="step" id="step-plan">&#128203; Planification</div>
+        <div class="step" id="step-rag">&#128269; RAG</div>
+        <div class="step" id="step-synth">&#9997;&#65039; Synthèse</div>
+        <div class="step" id="step-verify">&#10003; Vérification</div>
+      </div>
+      <div class="input-row">
+        <textarea id="chat-input" placeholder="Posez votre question académique... (Ctrl+K)" onkeydown="chatKey(event)"></textarea>
+        <button class="send-btn" onclick="sendChat()">&#9658; Envoyer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROUTING -->
+  <div class="panel" id="panel-routing">
+    <div class="panel-title">Décisions de routage</div>
+    <div class="panel-sub">Visualisation en temps réel des décisions du DynamicRouter</div>
+    <div class="grid4" style="margin-bottom:20px">
+      <div class="metric-card mc-teal"><div class="metric-icon" style="background:rgba(78,205,196,.15)">&#128200;</div><div class="metric-val" id="r-approval" style="color:var(--teal)">—</div><div class="metric-lbl">Taux approbation</div></div>
+      <div class="metric-card mc-blue"><div class="metric-icon" style="background:rgba(74,144,217,.15)">&#9200;</div><div class="metric-val" id="r-latency" style="color:var(--blue)">—</div><div class="metric-lbl">Latence moy. (ms)</div></div>
+      <div class="metric-card mc-amber"><div class="metric-icon" style="background:rgba(255,179,71,.15)">&#128260;</div><div class="metric-val" id="r-retries" style="color:var(--amber)">—</div><div class="metric-lbl">Taux de retry</div></div>
+      <div class="metric-card mc-orange"><div class="metric-icon" style="background:rgba(244,132,95,.15)">&#128202;</div><div class="metric-val" id="r-total" style="color:var(--orange)">0</div><div class="metric-lbl">Total requêtes</div></div>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">&#128202; Fréquence de sélection des agents</div>
+      <div class="bar-chart" id="agent-freq-chart">
+        <div class="bar-row"><div class="bar-label">Planner</div><div class="bar-track"><div class="bar-fill" id="bar-planner" style="width:0%;background:linear-gradient(90deg,var(--teal),#20b2aa)">0</div></div></div>
+        <div class="bar-row"><div class="bar-label">RAG</div><div class="bar-track"><div class="bar-fill" id="bar-rag" style="width:0%;background:linear-gradient(90deg,var(--blue),#2563eb)">0</div></div></div>
+        <div class="bar-row"><div class="bar-label">Synthesizer</div><div class="bar-track"><div class="bar-fill" id="bar-synth" style="width:0%;background:linear-gradient(90deg,var(--purple),#5b3fa6)">0</div></div></div>
+        <div class="bar-row"><div class="bar-label">Verifier</div><div class="bar-track"><div class="bar-fill" id="bar-verif" style="width:0%;background:linear-gradient(90deg,var(--amber),#e0993a)">0</div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#128203; Historique des décisions</div>
+      <table id="routing-table">
+        <thead><tr><th>Étape</th><th>Agent sélectionné</th><th>Confiance</th><th>Incertitude</th><th>Raisonnement</th></tr></thead>
+        <tbody id="routing-tbody"><tr><td colspan="5" style="text-align:center;color:var(--dim);padding:28px">Aucune décision. Soumettez une question dans le chat.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DOCS -->
+  <div class="panel" id="panel-docs">
+    <div class="panel-title">Documents RAG</div>
+    <div class="panel-sub">Indexez vos documents pour enrichir le contexte de l'assistant</div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleDrop(event)">
+        <div style="font-size:36px;margin-bottom:10px">&#128196;</div>
+        <div style="font-size:14px;font-weight:700;color:var(--text)">Glissez un fichier ou cliquez ici</div>
+        <div style="font-size:12px;color:var(--dim);margin-top:5px;font-weight:500">.txt, .md supportés</div>
+        <input type="file" id="file-input" style="display:none" accept=".txt,.md" onchange="loadFile(event)">
+      </div>
+      <div style="margin:18px 0;display:flex;align-items:center;gap:12px;color:var(--dim);font-size:12px;font-weight:700"><div style="flex:1;height:1px;background:var(--border)"></div>ou collez du texte<div style="flex:1;height:1px;background:var(--border)"></div></div>
+      <textarea id="ingest-text" rows="4" style="width:100%;background:var(--card2);border:2px solid var(--border);border-radius:12px;padding:12px 16px;font-size:13px;color:var(--text);font-family:var(--font);resize:none;font-weight:500" placeholder="Collez votre texte ici..."></textarea>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <input id="ingest-source" type="text" style="flex:1;background:var(--card2);border:2px solid var(--border);border-radius:10px;padding:10px 14px;font-size:13px;color:var(--text);font-family:var(--font);font-weight:500" placeholder="Nom de la source (ex: cours-biologie)">
+        <button class="primary-btn" onclick="ingestDoc()">&#8679; Indexer</button>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div class="card-title" style="margin:0">&#128218; Documents indexés</div>
+        <input id="doc-search" type="text" placeholder="&#128269; Filtrer..." style="background:var(--card2);border:2px solid var(--border);border-radius:8px;padding:7px 12px;font-size:12px;color:var(--text);font-family:var(--font);width:190px;font-weight:500" oninput="filterDocs()">
+      </div>
+      <div id="doc-list"><div class="empty-state"><div class="e-icon">&#128203;</div><p>Aucun document indexé.<br>Ajoutez un document ci-dessus pour commencer.</p></div></div>
+    </div>
+  </div>
+
+  <!-- AGENTS -->
+  <div class="panel" id="panel-agents">
+    <div class="panel-title">État des agents</div>
+    <div class="panel-sub">Surveillance en temps réel des 4 agents spécialisés</div>
+    <div class="grid2" style="margin-bottom:16px">
+      <div class="agent-card ac-teal">
+        <div class="agent-header">
+          <div class="agent-icon-wrap" style="background:rgba(78,205,196,.15)">&#128203;</div>
+          <div><div class="agent-name">PlannerAgent</div><div class="agent-role-txt">Planification & Décomposition</div></div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:5px"><span class="infra-dot" style="background:var(--green)"></span><span style="font-size:11px;color:var(--green);font-weight:700">Actif</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--dim);line-height:1.6;font-weight:500">Décompose les questions complexes en sous-tâches ordonnées et structurées pour le pipeline multi-agents.</div>
+        <div class="health-bar"><div class="health-fill" style="width:85%;background:linear-gradient(90deg,var(--teal),#20b2aa)"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);color:var(--dim);font-weight:600"><span>Confiance: <strong style="color:var(--teal)">85%</strong></span><span id="planner-tasks">0 tâches</span></div>
+        <div class="caps"><span class="cap-tag">plan</span><span class="cap-tag">decompose</span><span class="cap-tag">organize</span><span class="cap-tag">structure</span></div>
+      </div>
+      <div class="agent-card ac-blue">
+        <div class="agent-header">
+          <div class="agent-icon-wrap" style="background:rgba(74,144,217,.15)">&#128269;</div>
+          <div><div class="agent-name">RAGAgent</div><div class="agent-role-txt">Recherche & Récupération</div></div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:5px"><span class="infra-dot" style="background:var(--green)"></span><span style="font-size:11px;color:var(--green);font-weight:700">Actif</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--dim);line-height:1.6;font-weight:500">Interroge la base vectorielle ChromaDB pour extraire les passages les plus pertinents selon la requête.</div>
+        <div class="health-bar"><div class="health-fill" style="width:80%;background:linear-gradient(90deg,var(--blue),#2563eb)"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);color:var(--dim);font-weight:600"><span>Confiance: <strong style="color:var(--blue)">80%</strong></span><span id="rag-tasks">0 tâches</span></div>
+        <div class="caps"><span class="cap-tag">retrieve</span><span class="cap-tag">search</span><span class="cap-tag">find</span><span class="cap-tag">document</span></div>
+      </div>
+      <div class="agent-card ac-purple">
+        <div class="agent-header">
+          <div class="agent-icon-wrap" style="background:rgba(124,92,191,.15)">&#9997;&#65039;</div>
+          <div><div class="agent-name">SynthesizerAgent</div><div class="agent-role-txt">Rédaction & Synthèse</div></div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:5px"><span class="infra-dot" style="background:var(--green)"></span><span style="font-size:11px;color:var(--green);font-weight:700">Actif</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--dim);line-height:1.6;font-weight:500">Rédige la réponse académique finale structurée (intro, développement, conclusion) à partir du contexte.</div>
+        <div class="health-bar"><div class="health-fill" style="width:90%;background:linear-gradient(90deg,var(--purple),#5b3fa6)"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);color:var(--dim);font-weight:600"><span>Confiance: <strong style="color:var(--purple)">90%</strong></span><span id="synth-tasks">0 tâches</span></div>
+        <div class="caps"><span class="cap-tag">write</span><span class="cap-tag">synthesize</span><span class="cap-tag">explain</span><span class="cap-tag">generate</span></div>
+      </div>
+      <div class="agent-card ac-amber">
+        <div class="agent-header">
+          <div class="agent-icon-wrap" style="background:rgba(255,179,71,.15)">&#10003;</div>
+          <div><div class="agent-name">VerifierAgent</div><div class="agent-role-txt">Contrôle Qualité</div></div>
+          <div style="margin-left:auto;display:flex;align-items:center;gap:5px"><span class="infra-dot" style="background:var(--green)"></span><span style="font-size:11px;color:var(--green);font-weight:700">Actif</span></div>
+        </div>
+        <div style="font-size:12px;color:var(--dim);line-height:1.6;font-weight:500">Évalue factuel/cohérence/complétude (0–10), approuve ou déclenche une révision automatique.</div>
+        <div class="health-bar"><div class="health-fill" style="width:75%;background:linear-gradient(90deg,var(--amber),#e0993a)"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;font-family:var(--mono);color:var(--dim);font-weight:600"><span>Confiance: <strong style="color:var(--amber)">75%</strong></span><span id="verify-tasks">0 tâches</span></div>
+        <div class="caps"><span class="cap-tag">verify</span><span class="cap-tag">check</span><span class="cap-tag">validate</span><span class="cap-tag">review</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">&#9881; Infrastructure système</div>
+      <table class="infra-table">
+        <thead><tr><th>Composant</th><th>Type</th><th>Port</th><th>Statut</th></tr></thead>
+        <tbody>
+          <tr><td>API FastAPI</td><td style="font-family:var(--mono);font-size:11px;font-weight:600">REST HTTP</td><td style="font-family:var(--mono);font-size:11px;font-weight:600">8000</td><td id="infra-api"><span class="infra-dot" style="background:var(--red)"></span>Inconnu</td></tr>
+          <tr><td>Serveur MCP</td><td style="font-family:var(--mono);font-size:11px;font-weight:600">MCP Protocol</td><td style="font-family:var(--mono);font-size:11px;font-weight:600">8001</td><td><span class="infra-dot" style="background:var(--green)"></span><span style="color:var(--teal);font-weight:600">Actif</span></td></tr>
+          <tr><td>Message Bus A2A</td><td style="font-family:var(--mono);font-size:11px;font-weight:600">In-Memory</td><td style="font-family:var(--mono);font-size:11px;font-weight:600">—</td><td><span class="infra-dot" style="background:var(--green)"></span><span style="color:var(--teal);font-weight:600">Actif</span></td></tr>
+          <tr><td>HybridMemory</td><td style="font-family:var(--mono);font-size:11px;font-weight:600">SQLite + ChromaDB</td><td style="font-family:var(--mono);font-size:11px;font-weight:600">—</td><td><span class="infra-dot" style="background:var(--green)"></span><span style="color:var(--teal);font-weight:600">Actif</span></td></tr>
+          <tr><td>LLM (Ollama)</td><td style="font-family:var(--mono);font-size:11px;font-weight:600">llama3</td><td style="font-family:var(--mono);font-size:11px;font-weight:600">11434</td><td id="infra-llm"><span class="infra-dot" style="background:var(--red)"></span>Inconnu</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- EXAM -->
+  <div class="panel" id="panel-exam">
+    <div class="panel-title">Générateur d'examens</div>
+    <div class="panel-sub">Créez des examens académiques personnalisés grâce à l'IA</div>
+    <div class="card">
+      <div class="exam-form">
+        <div class="form-group full-col"><label>Matière</label><input id="ex-subject" type="text" placeholder="ex: Biologie cellulaire, Algorithmique, Physique quantique..."></div>
+        <div class="form-group"><label>Niveau</label>
+          <select id="ex-level"><option>Licence 1</option><option>Licence 2</option><option selected>Licence 3</option><option>Master 1</option><option>Master 2</option></select>
+        </div>
+        <div class="form-group"><label>Type de questions</label>
+          <select id="ex-type"><option>QCM</option><option>Questions ouvertes</option><option>Vrai-Faux</option><option>Cas pratique</option><option>Mixte</option></select>
+        </div>
+        <div class="form-group"><label>Nombre de questions: <strong id="ex-num-val">10</strong></label>
+          <input type="range" id="ex-num" min="5" max="30" value="10" oninput="document.getElementById('ex-num-val').textContent=this.value">
+        </div>
+        <div class="form-group"><label>Difficulté</label>
+          <select id="ex-diff"><option>Facile</option><option selected>Moyen</option><option>Difficile</option><option>Mixte</option></select>
+        </div>
+        <div class="form-group"><label>Langue</label>
+          <select id="ex-lang"><option>Français</option><option>Anglais</option><option>Arabe</option></select>
+        </div>
+        <div class="form-group full-col" style="align-items:flex-start">
+          <button class="primary-btn" onclick="generateExam()">&#128196; Générer l'examen</button>
+        </div>
+      </div>
+    </div>
+    <div id="exam-skeleton" style="display:none">
+      <div style="height:80px;margin-top:20px" class="skeleton"></div>
+      <div style="height:220px;margin-top:10px" class="skeleton"></div>
+    </div>
+    <div class="exam-output" id="exam-output">
+      <div class="exam-header-block">
+        <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--sidebar)" id="exam-title">Examen</div>
+        <div style="font-size:12px;color:var(--dim);margin-top:7px;font-family:var(--mono);font-weight:600" id="exam-meta"></div>
+      </div>
+      <div class="exam-body" id="exam-content"></div>
+      <div class="exam-actions">
+        <button class="primary-btn" onclick="window.print()">&#128438; Télécharger PDF</button>
+        <button class="sec-btn" onclick="copyExam()">&#128203; Copier</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERF -->
+  <div class="panel" id="panel-perf">
+    <div class="panel-title">Analyse de performance</div>
+    <div class="panel-sub">Métriques et tendances du pipeline multi-agents</div>
+    <div class="grid4" style="margin-bottom:18px">
+      <div class="metric-card mc-orange"><div class="metric-icon" style="background:rgba(244,132,95,.12)">&#128202;</div><div class="metric-val" id="p-total" style="color:var(--orange)">0</div><div class="metric-lbl">Total requêtes</div></div>
+      <div class="metric-card mc-teal"><div class="metric-icon" style="background:rgba(78,205,196,.12)">&#10003;</div><div class="metric-val" id="p-approved" style="color:var(--teal)">0</div><div class="metric-lbl">Approuvées</div></div>
+      <div class="metric-card mc-blue"><div class="metric-icon" style="background:rgba(74,144,217,.12)">&#9200;</div><div class="metric-val" id="p-avg" style="color:var(--blue)">—</div><div class="metric-lbl">Latence moy.</div></div>
+      <div class="metric-card mc-amber"><div class="metric-icon" style="background:rgba(255,179,71,.12)">&#128260;</div><div class="metric-val" id="p-retry" style="color:var(--amber)">0</div><div class="metric-lbl">Retries total</div></div>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">&#128202; Latence par requête (ms)</div>
+      <div class="perf-line" id="perf-latency-chart"><div style="color:var(--dim);font-size:12px;font-weight:500">Aucune donnée</div></div>
+    </div>
+    <div class="grid2">
+      <div class="card">
+        <div class="card-title">Répartition approbations</div>
+        <div class="score-row"><span style="color:var(--teal);width:90px;font-weight:700">&#10003; Approuvées</span><div class="score-track"><div id="p-bar-ok" class="score-fill" style="width:0%;background:var(--teal)"></div></div><span id="p-rate-ok" style="font-family:var(--mono);font-size:11px;font-weight:700;width:36px;text-align:right">—</span></div>
+        <div class="score-row"><span style="color:var(--red);width:90px;font-weight:700">&#10007; Rejetées</span><div class="score-track"><div id="p-bar-ko" class="score-fill" style="width:0%;background:var(--red)"></div></div><span id="p-rate-ko" style="font-family:var(--mono);font-size:11px;font-weight:700;width:36px;text-align:right">—</span></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Scores de vérification</div>
+        <div id="verify-scores" style="font-size:12px;color:var(--dim);font-weight:500">Aucune donnée de vérification.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="panel" id="panel-history">
+    <div class="panel-title">Historique des sessions</div>
+    <div class="panel-sub">Consultez et relancez vos sessions précédentes</div>
+    <div id="history-list"><div class="empty-state"><div class="e-icon">&#128336;</div><p>Aucune session enregistrée.<br>Soumettez des questions pour les voir ici.</p></div></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="panel" id="panel-settings">
+    <div class="panel-title">Paramètres</div>
+    <div class="panel-sub">Configuration de la connexion et du pipeline</div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">&#128268; Connexion API</div>
+      <div class="settings-row">
+        <input id="api-url-input" type="text" value="http://localhost:8000" placeholder="http://localhost:8000">
+        <button class="primary-btn" onclick="testConnection()">Connecter</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600">
+        <div class="sdot" id="settings-dot"></div><span id="settings-conn-txt" style="color:var(--dim)">Statut inconnu</span>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="card-title">&#9881; Configuration du pipeline</div>
+      <table class="config-table">
+        <thead><tr><th>Paramètre</th><th>Valeur</th></tr></thead>
+        <tbody>
+          <tr><td>Modèle LLM</td><td>llama3 (Ollama local)</td></tr>
+          <tr><td>Top-K documents</td><td>5</td></tr>
+          <tr><td>Max retries vérification</td><td>2</td></tr>
+          <tr><td>Seuil approbation</td><td>0.7</td></tr>
+          <tr><td>Poids incertitude router</td><td>0.40</td></tr>
+          <tr><td>Poids contexte router</td><td>0.25</td></tr>
+          <tr><td>Poids confiance router</td><td>0.35</td></tr>
+          <tr><td>Protocole agents</td><td>A2A / InMemoryMessageBus</td></tr>
+          <tr><td>Mémoire persistante</td><td>SQLite + ChromaDB</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">&#128421; Journal des appels API</div>
+      <div class="terminal" id="terminal-log">
+        <div class="t-line">&#9656; AcademiQ Terminal v2.0 — prêt</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- .main -->
+</div><!-- .layout -->
+
+<script>
+const S={apiUrl:localStorage.getItem('apiUrl')||'http://localhost:8000',connected:false,requests:[],docs:[],routing:[],sessions:[],agentCounts:{planner:0,rag:0,synthesizer:0,verifier:0},latencies:[],retries:0,approved:0};
+document.getElementById('api-url-input').value=S.apiUrl;
+
+function show(id){
+  document.querySelectorAll('.panel').forEach(p=>{p.style.display='none';p.classList.remove('active')});
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
+  const panel=document.getElementById('panel-'+id);
+  panel.style.display='block';
+  requestAnimationFrame(()=>panel.classList.add('active'));
+  const btn=document.getElementById('nav-'+id);
+  if(btn)btn.classList.add('active');
+  if(id==='routing')updateRoutingPanel();
+  if(id==='perf')updatePerfPanel();
+  if(id==='history')renderHistory();
+}
+
+function toast(msg,type='info'){
+  const w=document.getElementById('toasts');
+  const t=document.createElement('div');
+  t.className='toast';
+  const icon=type==='ok'?'✅':type==='err'?'❌':'ℹ️';
+  t.innerHTML=icon+' '+msg;
+  w.appendChild(t);
+  setTimeout(()=>t.remove(),3500);
+}
+
+function termLog(msg,type=''){
+  const term=document.getElementById('terminal-log');
+  const line=document.createElement('div');
+  line.className='t-line'+(type?' t-'+type:'');
+  line.textContent=new Date().toLocaleTimeString()+' › '+msg;
+  term.appendChild(line);
+  term.scrollTop=term.scrollHeight;
+}
+
+function updateMetrics(){
+  const total=S.requests.length,ok=S.approved;
+  const avg=S.latencies.length?Math.round(S.latencies.reduce((a,b)=>a+b,0)/S.latencies.length):null;
+  const rate=total?Math.round(ok/total*100)+'%':'—';
+  document.getElementById('m-req').textContent=total;
+  document.getElementById('m-ok').textContent=ok;
+  document.getElementById('m-lat').textContent=avg?avg+'ms':'—';
+  document.getElementById('m-rate').textContent=rate;
+}
+
+async function testConnection(){
+  const url=document.getElementById('api-url-input').value.trim();
+  S.apiUrl=url;localStorage.setItem('apiUrl',url);
+  termLog('GET '+url+'/health ...');
+  try{
+    const r=await fetch(url+'/health',{signal:AbortSignal.timeout(5000)});
+    if(r.ok){
+      S.connected=true;
+      document.getElementById('sdot').className='sdot ok';
+      document.getElementById('conn-txt').textContent='Connecté';
+      document.getElementById('settings-dot').className='sdot ok';
+      document.getElementById('settings-conn-txt').textContent='Connecté à '+url;
+      document.getElementById('infra-api').innerHTML='<span class="infra-dot" style="background:var(--green)"></span><span style="color:var(--teal);font-weight:600">Actif</span>';
+      toast('Connexion réussie !','ok');termLog('200 OK — API active','ok');
+    }else{throw new Error('HTTP '+r.status);}
+  }catch(e){
+    S.connected=false;
+    document.getElementById('sdot').className='sdot';
+    document.getElementById('conn-txt').textContent='Déconnecté';
+    document.getElementById('settings-conn-txt').textContent='Erreur: '+e.message;
+    toast('Connexion échouée: '+e.message,'err');termLog('ERR — '+e.message,'err');
+  }
+}
+
+function addMsg(role,html,agent){
+  const area=document.getElementById('chat-area');
+  const div=document.createElement('div');
+  div.className='msg '+role;
+  if(role==='bot'){
+    const badge=`<div class="agent-badge">🤖 ${agent||'Orchestrateur'}</div>`;
+    div.innerHTML=badge+'<div>'+html+'</div>';
+  }else{div.textContent=html;}
+  area.appendChild(div);
+  area.scrollTop=area.scrollHeight;
+  return div;
+}
+
+function setPipelineStep(sid,state){
+  const el=document.getElementById(sid);if(!el)return;
+  el.className='step '+state;
+  if(state==='done'&&el.textContent.indexOf('✓')<0)el.textContent='✓ '+el.textContent.replace(/^[\S]+ /,'');
+}
+
+async function animatePipeline(){
+  const steps=document.getElementById('pipeline-steps');
+  steps.style.display='flex';
+  ['step-plan','step-rag','step-synth','step-verify'].forEach(s=>{document.getElementById(s).className='step';});
+  const labels=['step-plan','step-rag','step-synth','step-verify'];
+  for(let i=0;i<labels.length;i++){
+    setPipelineStep(labels[i],'running');
+    await new Promise(r=>setTimeout(r,700));
+    setPipelineStep(labels[i],'done');
+  }
+  await new Promise(r=>setTimeout(r,1200));
+  steps.style.display='none';
+}
+
+function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
+
+async function sendChat(){
+  const inp=document.getElementById('chat-input');
+  const q=inp.value.trim();if(!q)return;
+  inp.value='';
+  addMsg('user',q);
+  const typing=document.createElement('div');
+  typing.className='typing';
+  typing.innerHTML='🤖 Pipeline en cours <span class="dots"><span></span><span></span><span></span></span>';
+  document.getElementById('chat-area').appendChild(typing);
+  document.getElementById('chat-area').scrollTop=99999;
+  const pipeAnim=animatePipeline();
+  termLog('POST /ask — "'+q.substring(0,40)+'"');
+  let result=null;const t0=Date.now();
+  if(S.connected){
+    try{
+      const r=await fetch(S.apiUrl+'/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,session_id:'ui-'+Date.now(),top_k_docs:5}),signal:AbortSignal.timeout(180000)});
+      if(r.ok)result=await r.json();
+    }catch(e){termLog('ERR POST /ask: '+e.message,'err');}
+  }
+  await pipeAnim;
+  const lat=Date.now()-t0;
+  typing.remove();
+  if(result){
+    S.latencies.push(result.duration_ms||lat);
+    S.requests.push({q,t:Date.now(),result});
+    if(result.approved)S.approved++;
+    S.retries+=(result.retry_count||0);
+    if(result.routing_decisions){
+      S.routing.push(...result.routing_decisions);
+      result.routing_decisions.forEach(rd=>{
+        const ag=(rd.actual_agent||rd.decision?.selected_agent||'').toLowerCase();
+        if(ag.includes('plan'))S.agentCounts.planner++;
+        else if(ag.includes('rag')||ag.includes('retriev'))S.agentCounts.rag++;
+        else if(ag.includes('synth'))S.agentCounts.synthesizer++;
+        else if(ag.includes('verif'))S.agentCounts.verifier++;
+        const ids=['planner-tasks','rag-tasks','synth-tasks','verify-tasks'];
+        const vals=[S.agentCounts.planner,S.agentCounts.rag,S.agentCounts.synthesizer,S.agentCounts.verifier];
+        ids.forEach((id,i)=>{document.getElementById(id).textContent=vals[i]+' tâches';});
+      });
+    }
+    const appr=result.approved?'<span style="color:var(--teal);font-size:11px;font-weight:700">✓ Approuvé</span>':'<span style="color:var(--amber);font-size:11px;font-weight:700">⚠ Non approuvé</span>';
+    const latStr=`<span style="color:var(--dim);font-size:11px;font-family:var(--mono);font-weight:600">${result.duration_ms||lat}ms</span>`;
+    addMsg('bot',(result.final_answer||'Pas de réponse')+'<br><br>'+appr+' '+latStr,'API Réelle (Ollama)');
+    S.sessions.unshift({q,answer:result.final_answer,t:Date.now(),approved:result.approved,lat:result.duration_ms||lat});
+    termLog('200 OK — '+(result.duration_ms||lat)+'ms — approved:'+result.approved,'ok');
+  }else{
+    const demo=getDemoAnswer(q);
+    S.requests.push({q,t:Date.now(),demo:true});
+    addMsg('bot',demo+'<br><br><span style="color:var(--amber);font-size:11px;font-weight:700">⚠ Mode démo (API non disponible)</span>','Démo');
+    S.sessions.unshift({q,answer:demo,t:Date.now(),approved:false,lat:lat});
+  }
+  updateMetrics();updatePerfPanel();
+}
+
+function getDemoAnswer(q){
+  const ql=q.toLowerCase();
+  if(ql.includes('krebs')||ql.includes('respiration'))return"Le cycle de Krebs est une suite de réactions dans la matrice mitochondriale. Il oxyde l'acétyl-CoA pour produire 3 NADH, 1 FADH₂ et 1 GTP par tour, alimentant la chaîne respiratoire pour ~20 ATP/glucose.";
+  if(ql.includes('photosynthèse')||ql.includes('photosynthese'))return"La photosynthèse convertit CO₂+H₂O+lumière → glucose+O₂. Phase lumineuse (thylakoïdes): ATP+NADPH. Cycle de Calvin (stroma): fixation du CO₂.";
+  if(ql.includes('machine learning')||ql.includes('apprentissage'))return"Le ML comprend 3 paradigmes: supervisé (classification/régression), non-supervisé (clustering), renforcement (optimisation). Algo clés: réseaux de neurones, SVM, arbres de décision.";
+  if(ql.includes('adn')||ql.includes('génétique'))return"L'ADN est une double hélice (A-T, G-C) portant l'info génétique. Transcription → ARNm → traduction → protéines (dogme central). Réplication semi-conservative.";
+  return"Question reçue. En mode démo, connectez l'API Ollama (port 8000) pour des réponses complètes et personnalisées via le pipeline multi-agents.";
+}
+
+async function generateExam(){
+  const subj=document.getElementById('ex-subject').value.trim();
+  if(!subj){toast('Veuillez saisir une matière','err');return;}
+  const level=document.getElementById('ex-level').value;
+  const type=document.getElementById('ex-type').value;
+  const num=document.getElementById('ex-num').value;
+  const diff=document.getElementById('ex-diff').value;
+  const lang=document.getElementById('ex-lang').value;
+  document.getElementById('exam-output').style.display='none';
+  document.getElementById('exam-skeleton').style.display='block';
+  const prompt=`Génère un examen académique complet en ${lang}. Matière: ${subj}. Niveau: ${level}. Type: ${type}. Nombre: ${num} questions. Difficulté: ${diff}. Formate chaque question avec son numéro et un espace pour la réponse.`;
+  let content='';
+  if(S.connected){
+    try{
+      const r=await fetch(S.apiUrl+'/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:prompt,top_k_docs:3}),signal:AbortSignal.timeout(180000)});
+      if(r.ok){const d=await r.json();content=d.final_answer||'';}
+    }catch(e){}
+  }
+  if(!content)content=generateDemoExam(subj,type,num,diff,lang);
+  document.getElementById('exam-skeleton').style.display='none';
+  document.getElementById('exam-title').textContent='Examen — '+subj+' ('+level+')';
+  document.getElementById('exam-meta').textContent='Type: '+type+' | Difficulté: '+diff+' | '+num+' questions | Durée estimée: '+(num*3)+' min | Date: '+new Date().toLocaleDateString('fr-FR');
+  document.getElementById('exam-content').textContent=content;
+  document.getElementById('exam-output').style.display='block';
+  toast('Examen généré !','ok');
+}
+
+function generateDemoExam(subj,type,num,diff,lang){
+  let out='EXAMEN — '+subj.toUpperCase()+'\n'+'='.repeat(52)+'\n\n';
+  out+='Nom & Prénom: _________________________  Note: ___/20\n';
+  out+='Date: '+new Date().toLocaleDateString('fr-FR')+'\n\n';
+  for(let i=1;i<=Math.min(num,8);i++){
+    if(type==='QCM'){out+='Q'+i+'. [Question '+diff+' sur '+subj+']\n   a) Proposition A\n   b) Proposition B\n   c) Proposition C\n   d) Proposition D\n\n';}
+    else if(type==='Vrai-Faux'){out+='Q'+i+'. [Affirmation sur '+subj+']\n   ☐ Vrai   ☐ Faux\n   Justification: _________________________\n\n';}
+    else{out+='Q'+i+'. [Question '+diff+' sur '+subj+']\n   Réponse:\n   '+'_'.repeat(60)+'\n   '+'_'.repeat(60)+'\n\n';}
+  }
+  out+='\n[Connectez l\'API Ollama pour un examen complet généré par IA]';
+  return out;
+}
+
+function copyExam(){navigator.clipboard.writeText(document.getElementById('exam-content').textContent).then(()=>toast('Copié !','ok'));}
+
+async function ingestDoc(){
+  const text=document.getElementById('ingest-text').value.trim();
+  const source=document.getElementById('ingest-source').value.trim()||'document-'+Date.now();
+  if(!text){toast('Veuillez saisir du texte','err');return;}
+  termLog('POST /ingest — source:'+source);
+  let chunks=0;
+  if(S.connected){try{const r=await fetch(S.apiUrl+'/ingest',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,source})});if(r.ok){const d=await r.json();chunks=d.chunks_indexed||1;}}catch(e){termLog('ERR /ingest: '+e.message,'err');}}
+  else{chunks=Math.max(1,Math.floor(text.split('\n\n').length));}
+  S.docs.push({source,chunks,date:new Date().toLocaleString('fr-FR'),preview:text.substring(0,80)+'...'});
+  renderDocs();
+  document.getElementById('ingest-text').value='';
+  toast(chunks+' chunk(s) indexé(s) depuis "'+source+'"','ok');
+  termLog(chunks+' chunks indexés','ok');
+}
+
+function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').classList.remove('drag');const file=e.dataTransfer.files[0];if(file)readFile(file);}
+function loadFile(e){if(e.target.files[0])readFile(e.target.files[0]);}
+function readFile(file){const reader=new FileReader();reader.onload=ev=>{document.getElementById('ingest-text').value=ev.target.result;document.getElementById('ingest-source').value=file.name.replace(/\.[^.]+$/,'');};reader.readAsText(file);}
+
+function renderDocs(){
+  const list=document.getElementById('doc-list');
+  const q=(document.getElementById('doc-search').value||'').toLowerCase();
+  const filtered=S.docs.filter(d=>d.source.toLowerCase().includes(q)||d.preview.toLowerCase().includes(q));
+  if(!filtered.length){list.innerHTML='<div class="empty-state"><div class="e-icon">📄</div><p>Aucun document indexé.</p></div>';return;}
+  list.innerHTML=filtered.map(d=>`<div class="doc-item"><div style="font-size:24px">📄</div><div style="flex:1"><div style="font-size:13px;font-weight:700">${d.source}</div><div style="font-size:11px;color:var(--dim);font-family:var(--mono);font-weight:600">${d.chunks} chunks · ${d.date}</div><div style="font-size:11px;color:var(--dim);margin-top:2px">${d.preview}</div></div></div>`).join('');
+}
+function filterDocs(){renderDocs();}
+
+function updateRoutingPanel(){
+  const total=S.requests.length,ok=S.approved;
+  const avg=S.latencies.length?Math.round(S.latencies.reduce((a,b)=>a+b,0)/S.latencies.length):null;
+  document.getElementById('r-total').textContent=total;
+  document.getElementById('r-approval').textContent=total?Math.round(ok/total*100)+'%':'—';
+  document.getElementById('r-latency').textContent=avg?avg+'ms':'—';
+  document.getElementById('r-retries').textContent=total?Math.round(S.retries/total*100)+'%':'—';
+  const counts=S.agentCounts;
+  const maxC=Math.max(1,...Object.values(counts));
+  ['planner','rag','synth','verif'].forEach((id,i)=>{
+    const keys=['planner','rag','synthesizer','verifier'];
+    const c=counts[keys[i]]||0;
+    const pct=Math.round(c/maxC*100);
+    const bar=document.getElementById('bar-'+id);
+    if(bar){bar.style.width=pct+'%';bar.textContent=c;}
+  });
+  const tbody=document.getElementById('routing-tbody');
+  if(!S.routing.length){tbody.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--dim);padding:28px;font-weight:500">Aucune décision. Soumettez une question.</td></tr>';return;}
+  tbody.innerHTML=S.routing.slice(-20).reverse().map(rd=>{
+    const ag=rd.actual_agent||rd.decision?.selected_agent||'n/a';
+    const conf=rd.decision?.confidence_score||0;
+    const unc=rd.decision?.uncertainty_score||0;
+    const pill=conf>=0.7?'green':conf>=0.5?'amber':'red';
+    return`<tr><td style="font-family:var(--mono);font-weight:600">${rd.step||'—'}</td><td style="font-weight:600">${ag}</td><td><span class="pill ${pill}">${Math.round(conf*100)}%</span></td><td style="font-family:var(--mono);font-weight:600">${Math.round(unc*100)}%</td><td style="color:var(--dim);font-size:11px;font-weight:500">${(rd.decision?.reasoning||'').substring(0,60)}</td></tr>`;
+  }).join('');
+}
+
+function updatePerfPanel(){
+  const total=S.requests.length,ok=S.approved;
+  const avg=S.latencies.length?Math.round(S.latencies.reduce((a,b)=>a+b,0)/S.latencies.length):0;
+  document.getElementById('p-total').textContent=total;
+  document.getElementById('p-approved').textContent=ok;
+  document.getElementById('p-avg').textContent=avg?avg+'ms':'—';
+  document.getElementById('p-retry').textContent=S.retries;
+  const okRate=total?Math.round(ok/total*100):0;
+  const koRate=100-okRate;
+  document.getElementById('p-rate-ok').textContent=okRate+'%';
+  document.getElementById('p-rate-ko').textContent=koRate+'%';
+  document.getElementById('p-bar-ok').style.width=okRate+'%';
+  document.getElementById('p-bar-ko').style.width=koRate+'%';
+  if(S.latencies.length){
+    const max=Math.max(...S.latencies,1);
+    const chart=document.getElementById('perf-latency-chart');
+    chart.innerHTML=S.latencies.slice(-20).map(l=>{const h=Math.max(4,Math.round(l/max*86));return`<div class="perf-bar" title="${l}ms" style="height:${h}px"></div>`;}).join('');
+  }
+  const lastVerif=S.requests.filter(r=>r.result?.verification).slice(-1)[0];
+  if(lastVerif&&lastVerif.result.verification){
+    const v=lastVerif.result.verification;
+    document.getElementById('verify-scores').innerHTML=`
+      <div class="score-row"><span style="color:var(--dim);width:100px;font-weight:600">Factuel</span><div class="score-track"><div class="score-fill" style="width:${(v.factual||0)*10}%;background:var(--teal)"></div></div><span style="font-family:var(--mono);font-size:11px;font-weight:700">${v.factual||0}/10</span></div>
+      <div class="score-row"><span style="color:var(--dim);width:100px;font-weight:600">Cohérence</span><div class="score-track"><div class="score-fill" style="width:${(v.coherence||0)*10}%;background:var(--blue)"></div></div><span style="font-family:var(--mono);font-size:11px;font-weight:700">${v.coherence||0}/10</span></div>
+      <div class="score-row"><span style="color:var(--dim);width:100px;font-weight:600">Complétude</span><div class="score-track"><div class="score-fill" style="width:${(v.completeness||0)*10}%;background:var(--purple)"></div></div><span style="font-family:var(--mono);font-size:11px;font-weight:700">${v.completeness||0}/10</span></div>
+    `;
+  }
+}
+
+function renderHistory(){
+  const list=document.getElementById('history-list');
+  if(!S.sessions.length){list.innerHTML='<div class="empty-state"><div class="e-icon">🕐</div><p>Aucune session.<br>Posez des questions dans le chat.</p></div>';return;}
+  list.innerHTML=S.sessions.map((s,i)=>`
+    <div class="session-item" onclick="replaySession(${i})">
+      <div style="font-size:26px">${s.approved?'✅':'📝'}</div>
+      <div class="session-preview">
+        <div style="font-weight:700;margin-bottom:3px;color:var(--text)">${s.q.substring(0,90)}${s.q.length>90?'...':''}</div>
+        <div style="font-size:11px;color:var(--dim);font-weight:600">${s.approved?'✓ Approuvé':'⚠ Non approuvé'} · ${s.lat}ms</div>
+      </div>
+      <div class="session-date">${new Date(s.t).toLocaleTimeString('fr-FR')}</div>
+    </div>
+  `).join('');
+}
+
+function replaySession(i){
+  const s=S.sessions[i];
+  document.getElementById('chat-input').value=s.q;
+  show('chat');toast('Question chargée dans le chat','ok');
+}
+
+function updateClock(){document.getElementById('topbar-time').textContent=new Date().toLocaleTimeString('fr-FR');}
+
+async function autoConnect(){
+  try{
+    const r=await fetch(S.apiUrl+'/health',{signal:AbortSignal.timeout(3000)});
+    if(r.ok){
+      S.connected=true;
+      document.getElementById('sdot').className='sdot ok';
+      document.getElementById('conn-txt').textContent='Connecté';
+      document.getElementById('infra-api').innerHTML='<span class="infra-dot" style="background:var(--green)"></span><span style="color:var(--teal);font-weight:600">Actif</span>';
+      termLog('Auto-connexion réussie sur '+S.apiUrl,'ok');
+    }
+  }catch(e){termLog('API non disponible — mode démo actif');}
+}
+
+async function fetchUIStats(){
+  if(!S.connected)return;
+  try{
+    const r=await fetch(S.apiUrl+'/ui/summary',{signal:AbortSignal.timeout(3000)});
+    if(!r.ok)return;
+    const d=await r.json();
+    if(d.routing&&Array.isArray(d.routing)&&d.routing.length>S.routing.length)S.routing.push(...d.routing.slice(S.routing.length));
+  }catch(e){}
+}
+
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();document.getElementById('chat-input').focus();}});
+setInterval(updateClock,1000);setInterval(fetchUIStats,10000);
+updateClock();autoConnect();
+document.querySelectorAll('.panel').forEach(p=>p.style.display='none');
+document.getElementById('panel-chat').style.display='block';
+requestAnimationFrame(()=>document.getElementById('panel-chat').classList.add('active'));
+</script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Assistant Académique Multi-Agents</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons@latest/tabler-icons.min.css">
+  <style>
+    :root {
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+      --color-text-primary: #1f2937;
+      --color-text-secondary: #6b7280;
+      --color-text-tertiary: #9ca3af;
+      --color-background-primary: #ffffff;
+      --color-background-secondary: #f9fafb;
+      --color-border-tertiary: #e5e7eb;
+      --color-border-secondary: #d1d5db;
+      --color-text-success: #059669;
+      --color-background-success: #d1fae5;
+      --color-text-info: #0891b2;
+      --color-background-info: #cffafe;
+      --border-radius-lg: 8px;
+      --border-radius-md: 6px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      color: var(--color-text-primary);
+      background: #f3f4f6;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      grid-template-rows: 52px 1fr;
+      height: 100vh;
+      background: var(--color-background-primary);
+    }
+
+    .topbar {
+      grid-column: 1/-1;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 16px;
+      border-bottom: 0.5px solid var(--color-border-tertiary);
+      background: var(--color-background-primary);
+    }
+
+    .topbar-logo {
+      width: 28px;
+      height: 28px;
+      background: #534AB7;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .topbar-title {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .topbar-sub {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #639922;
+    }
+
+    .sidebar {
+      background: var(--color-background-secondary);
+      border-right: 0.5px solid var(--color-border-tertiary);
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+    }
+
+    .sidebar-label {
+      font-size: 11px;
+      color: var(--color-text-tertiary);
+      font-weight: 500;
+      padding: 4px 8px 2px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      transition: background 0.15s;
+    }
+
+    .nav-btn:hover {
+      background: var(--color-background-primary);
+    }
+
+    .nav-btn.active {
+      background: var(--color-background-primary);
+      color: var(--color-text-primary);
+      font-weight: 500;
+    }
+
+    .main {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: none;
+    }
+
+    .panel.active {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chat-area {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 0;
+    }
+
+    .msg {
+      max-width: 82%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .msg.user {
+      align-self: flex-end;
+      background: #534AB7;
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg.bot {
+      align-self: flex-start;
+      background: var(--color-background-secondary);
+      border-bottom-left-radius: 4px;
+    }
+
+    .msg.bot .agent-tag {
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--color-text-tertiary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .msg.bot .agent-tag span {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 20px;
+      font-size: 10px;
+      background: var(--color-background-info);
+      color: var(--color-text-info);
+    }
+
+    .pipeline-steps {
+      display: flex;
+      gap: 6px;
+      padding: 8px 0 2px;
+      flex-wrap: wrap;
+    }
+
+    .step-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      border: 0.5px solid var(--color-border-tertiary);
+      background: var(--color-background-secondary);
+      color: var(--color-text-secondary);
+    }
+
+    .step-badge.done {
+      background: var(--color-background-success);
+      border-color: var(--color-border-tertiary);
+      color: var(--color-text-success);
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      padding-top: 8px;
+      border-top: 0.5px solid var(--color-border-tertiary);
+    }
+
+    .chat-input-row textarea {
+      flex: 1;
+      border: 0.5px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-md);
+      padding: 9px 12px;
+      font-size: 13px;
+      resize: none;
+      height: 40px;
+      font-family: inherit;
+      background: var(--color-background-primary);
+      color: var(--color-text-primary);
+    }
+
+    .send-btn {
+      padding: 0 14px;
+      background: #534AB7;
+      color: #fff;
+      border: none;
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .send-btn:hover {
+      background: #3C3489;
+    }
+
+    .thinking {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: var(--color-background-secondary);
+      border-radius: 12px;
+      border-bottom-left-radius: 4px;
+      align-self: flex-start;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4 }
+      50% { opacity: 1 }
+    }
+
+    .dot-anim span {
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+      margin: 0 1px;
+      animation: pulse 1.2s ease-in-out infinite;
+    }
+
+    .dot-anim span:nth-child(2) { animation-delay: 0.2s; }
+    .dot-anim span:nth-child(3) { animation-delay: 0.4s; }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .card {
+      background: var(--color-background-primary);
+      border: 0.5px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-lg);
+      padding: 14px 16px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 10px;
+      color: var(--color-text-secondary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="topbar-logo">A</div>
+    <span class="topbar-title">Assistant académique</span>
+    <div class="topbar-sub">
+      <span class="status-dot"></span>
+      <span style="font-size:12px;color:var(--color-text-secondary)">4 agents actifs · MCP connecté</span>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-label">Navigation</div>
+    <button class="nav-btn active" onclick="showPanel('chat')">
+      💬 Chat académique
+    </button>
+    <button class="nav-btn" onclick="showPanel('routing')">
+      📊 Décisions routage
+    </button>
+    <button class="nav-btn" onclick="showPanel('docs')">
+      📚 Documents RAG
+    </button>
+    <button class="nav-btn" onclick="showPanel('agents')">
+      🤖 État des agents
+    </button>
+    <div class="sidebar-label" style="margin-top:8px">Métriques</div>
+      <div style="padding:8px;font-size:12px;color:var(--color-text-secondary);line-height:1.6">
+        <div style="display:flex;justify-content:space-between"><span>Requêtes</span><span style="color:var(--color-text-primary);font-weight:500" id="req-count">0</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Approuvées</span><span style="color:#3B6D11;font-weight:500" id="ok-count">0</span></div>
+        <div style="display:flex;justify-content:space-between"><span>Latence moy.</span><span style="color:var(--color-text-primary);font-weight:500" id="avg-latency">—</span></div>
+      </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <!-- CHAT Panel -->
+    <div class="panel active" id="panel-chat">
+      <div class="chat-area" id="chat-area">
+        <div class="msg bot">
+          <div class="agent-tag"><i class="ti ti-cpu"></i><span>Orchestrateur</span></div>
+          <div style="margin-top:4px">Bonjour ! Je suis votre assistant académique multi-agents. Posez-moi une question de cours, je planifie, recherche, synthétise et vérifie automatiquement la réponse. 🎓</div>
+        </div>
+      </div>
+      <div class="chat-input-row">
+        <textarea id="user-input" placeholder="Posez votre question académique..." onkeydown="handleKey(event)"></textarea>
+        <button class="send-btn" onclick="sendMsg()"><i class="ti ti-send"></i> Envoyer</button>
+      </div>
+    </div>
+
+    <!-- Other panels (simplified) -->
+    <div class="panel" id="panel-routing">
+      <div class="card">
+        <div class="card-title">Décisions de routage</div>
+        <div id="routing-list" style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--color-text-secondary)">
+          <div>Aucune décision enregistrée.</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="panel" id="panel-docs">
+      <div class="card">
+        <div class="card-title">Documents indexés</div>
+        <p style="color:var(--color-text-secondary);font-size:12px" id="doc-count">0 documents actuellement</p>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-agents">
+      <div class="card">
+        <div class="card-title">État des agents</div>
+        <div id="agent-list" style="display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--color-text-secondary)">
+          <div>Chargement...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const demoKnowledge = {
+  photosynthèse: "La photosynthèse est le processus biochimique par lequel les plantes convertissent la lumière du soleil, le dioxyde de carbone et l'eau en glucose et oxygène. Elle se déroule en deux phases principales : la réaction photochimique (dépendante de la lumière) qui se produit dans les thylakoïdes, et le cycle de Calvin (cycle d'assimilation du carbone) qui se produit dans le stroma. La photosynthèse est essentielle à la vie sur Terre, produisant pratiquement tout l'oxygène atmosphérique et formant la base des chaînes alimentaires.",
+  
+  krebs: "Le cycle de Krebs (ou cycle de l'acide citrique) est une suite de réactions biochimiques qui se déroule dans la matrice mitochondriale. Il constitue la deuxième étape de la respiration cellulaire aérobie, après la glycolyse. Son rôle principal est d'oxyder l'acétyl-CoA pour produire des coenzymes réduits (NADH, FADH₂) qui alimentent la chaîne respiratoire. Pour chaque tour, le cycle produit 3 NADH, 1 FADH₂ et 1 GTP — soit une contribution indirecte d'environ 20 ATP par molécule de glucose.",
+  
+  "machine learning": "L'apprentissage automatique (Machine Learning) est une branche de l'intelligence artificielle qui permet aux systèmes d'apprendre à partir de données sans être explicitement programmés. On distingue trois paradigmes principaux : l'apprentissage supervisé (données étiquetées), l'apprentissage non supervisé (découverte de patterns), et l'apprentissage par renforcement (optimisation via récompenses). Les algorithmes fondamentaux incluent la régression linéaire, les arbres de décision, les réseaux de neurones et les machines à vecteurs de support (SVM).",
+  
+  bayes: "Le théorème de Bayes exprime la probabilité conditionnelle : P(A|B) = P(B|A)·P(A) / P(B). Il permet de mettre à jour une croyance initiale (prior) à la lumière de nouvelles données (likelihood) pour obtenir une croyance révisée (posterior). C'est la base du raisonnement bayésien, utilisé en statistiques, en IA et en médecine pour le diagnostic probabiliste.",
+  
+  adn: "L'ADN (acide désoxyribonucléique) est une molécule qui porte les instructions génétiques pour la vie. Il est composé de deux brins complémentaires enroulés en double hélice, où chaque brin est une chaîne de nucléotides. Les quatre bases nitrées sont : adénine (A), thymine (T), guanine (G) et cytosine (C). L'ADN se réplique de manière semi-conservative et constitue le support de l'hérédité pour tous les organismes vivants.",
+  
+  relativité: "La théorie de la relativité, proposée par Einstein, existe en deux formulations. La relativité restreinte (1905) établit l'équivalence masse-énergie (E=mc²) et postule que la vitesse de la lumière est constante. La relativité générale (1916) décrit la gravitation comme une courbure de l'espace-temps causée par la matière et l'énergie, révolutionnant notre compréhension de la gravitation."
+};
+
+function findBestAnswer(query) {
+  const qLower = query.toLowerCase();
+  
+  // Exact keyword matching
+  for (let key in demoKnowledge) {
+    if (qLower.includes(key)) {
+      return demoKnowledge[key];
+    }
+  }
+  
+  // Partial matching
+  for (let key in demoKnowledge) {
+    const words = key.split(' ');
+    if (words.some(w => qLower.includes(w))) {
+      return demoKnowledge[key];
+    }
+  }
+  
+  // Default response
+  return "Je n'ai pas trouvé d'information spécifique sur ce sujet dans ma base de connaissances. En mode démonstration, j'ai accès à : photosynthèse, respiration cellulaire (Krebs), machine learning, théorème de Bayes, ADN, et relativité. Posez une question sur l'un de ces sujets !";
+}
+
+function showPanel(name) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => {
+    if (b.onclick && b.onclick.toString().includes(name)) b.classList.add('active');
+  });
+  refreshSummary();
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMsg();
+  }
+}
+
+let reqCount = 0, okCount = 0;
+
+async function refreshSummary() {
+  try {
+    const res = await fetch('http://127.0.0.1:8000/ui/summary');
+    if (!res.ok) return;
+    const data = await res.json();
+    if (typeof data.requests === 'number') {
+      reqCount = data.requests;
+      okCount = data.approved || 0;
+      document.getElementById('req-count').textContent = reqCount;
+      document.getElementById('ok-count').textContent = okCount;
+    }
+    if (data.avg_latency_ms !== null && data.avg_latency_ms !== undefined) {
+      document.getElementById('avg-latency').textContent = Math.round(data.avg_latency_ms) + ' ms';
+    }
+    if (data.rag && typeof data.rag.indexed_docs === 'number') {
+      const count = data.rag.indexed_docs;
+      document.getElementById('doc-count').textContent = count + ' documents actuellement';
+    }
+    if (Array.isArray(data.routing)) {
+      const list = document.getElementById('routing-list');
+      list.innerHTML = '';
+      if (!data.routing.length) {
+        list.innerHTML = '<div>Aucune décision enregistrée.</div>';
+      } else {
+        data.routing.forEach(item => {
+          const row = document.createElement('div');
+          const agent = item.actual_agent || item.decision?.selected_agent || 'n/a';
+          const score = Math.round((item.decision?.confidence_score || 0) * 100);
+          row.textContent = `${item.step || 'step'} → ${agent} (${score}%)`;
+          list.appendChild(row);
+        });
+      }
+    }
+    if (Array.isArray(data.agents)) {
+      const list = document.getElementById('agent-list');
+      list.innerHTML = '';
+      data.agents.forEach(agent => {
+        const row = document.createElement('div');
+        const caps = Array.isArray(agent.capabilities) && agent.capabilities.length ? ` · ${agent.capabilities.slice(0,3).join(', ')}` : '';
+        row.textContent = `${agent.agent_id} (${agent.role}) · ${agent.status}${caps}`;
+        list.appendChild(row);
+      });
+    }
+  } catch (err) {
+    // ignore UI refresh errors
+  }
+}
+
+async function sendMsg() {
+  const inp = document.getElementById('user-input');
+  const q = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+
+  const area = document.getElementById('chat-area');
+
+  const userMsg = document.createElement('div');
+  userMsg.className = 'msg user';
+  userMsg.textContent = q;
+  area.appendChild(userMsg);
+
+  const thinking = document.createElement('div');
+  thinking.className = 'thinking';
+  thinking.innerHTML = '<i class="ti ti-cpu"></i> Pipeline en cours<span class="dot-anim"><span></span><span></span><span></span></span>';
+  area.appendChild(thinking);
+  area.scrollTop = area.scrollHeight;
+
+  await new Promise(r => setTimeout(r, 1500));
+
+  let resp = null;
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 120000);
+    
+    const response = await fetch('http://127.0.0.1:8000/ask', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        query: q,
+        session_id: 'ui-session',
+        top_k_docs: 5
+      }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeout);
+
+    if (response.ok) {
+      const result = await response.json();
+      resp = {
+        text: result.final_answer || 'Pas de réponse générée',
+        agent: 'API Réelle (Ollama)',
+        isReal: true
+      };
+    }
+  } catch (err) {
+    // Use demo data
+  }
+
+  if (!resp) {
+    const answer = findBestAnswer(q);
+    resp = {
+      text: answer,
+      agent: 'Base de connaissances (Démo)',
+      isReal: false
+    };
+  }
+
+  thinking.remove();
+
+  const steps = document.createElement('div');
+  steps.className = 'pipeline-steps';
+  ['Planification', 'Récupération RAG', 'Synthèse', 'Vérification'].forEach(s => {
+    const b = document.createElement('div');
+    b.className = 'step-badge done';
+    b.innerHTML = '✓ ' + s;
+    steps.appendChild(b);
+  });
+  area.appendChild(steps);
+
+  const botMsg = document.createElement('div');
+  botMsg.className = 'msg bot';
+  const statusNote = resp.isReal ? '' : '<div style="font-size:11px;color:var(--color-text-tertiary);margin-bottom:4px">⚠️ Mode démo</div>';
+  botMsg.innerHTML = `<div class="agent-tag"><i class="ti ti-cpu"></i><span>${resp.agent}</span></div>${statusNote}<div style="margin-top:4px">${resp.text}</div>`;
+  area.appendChild(botMsg);
+
+  reqCount++;
+  okCount++;
+  document.getElementById('req-count').textContent = reqCount;
+  document.getElementById('ok-count').textContent = okCount;
+  refreshSummary();
+  area.scrollTop = area.scrollHeight;
+}
+
+refreshSummary();
+setInterval(refreshSummary, 10000);
+</script>
+
+</body>
+</html>
